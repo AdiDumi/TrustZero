@@ -3,17 +3,17 @@ version: '3.8'
 services:
   modsecurity:
     build:
-      context: ./modsecurity
+      context: ./first_stage
     ports:
       - "80:80"
     networks:
       - my_network
-  slowhttptest:
-    build:
-        context: ./slowhttp
-    command: [ "slowhttptest", "-u http://modsecurity:80" ]
-    networks:
-        - my_network
+#  slowhttptest:
+#    build:
+#        context: ./slowhttp
+#    command: [ "slowhttptest", "-u http://modsecurity:80" ]
+#    networks:
+#        - my_network
 
 networks:
   my_network:
