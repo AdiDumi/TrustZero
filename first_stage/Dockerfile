@@ -4,6 +4,7 @@ FROM python:3.9-slim
 RUN apt-get update && \
     apt-get install -y apache2 libapache2-mod-security2 && \
     apt-get install -y incron && \
+    apt-get install -y openssl && \
     apt-get clean
 
 # Set up working directory
@@ -16,7 +17,7 @@ COPY requirements.txt /app
 COPY process_log.py /usr/local/bin/process_log.py
 
 # Install Python dependencies
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 RUN chmod +x /usr/local/bin/process_log.py
 
@@ -40,4 +41,4 @@ RUN echo "/var/log/apache2/modsec_audit.log IN_MODIFY /usr/local/bin/python /usr
 EXPOSE 80
 
 # Start Apache and Flask app
-CMD ["sh", "-c", "service apache2 start && incrond && python /app/app.py"]
+CMD ["sh","-c","openssl genrsa -out private_key.pem 2048 && openssl rsa -in private_key.pem -outform PEM -pubout -out public_key.pem && service apache2 start && incrond && python /app/app.py"]
