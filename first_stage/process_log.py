@@ -9,7 +9,10 @@ def process_log_entry(entry):
     ip_address = entry['transaction']['remote_address']
     request_method, request_uri = entry['request']['request_line'].split(' ', 1)
     status_code = entry['response']['status']
-    message = entry['audit_data']['messages'][0] if entry['audit_data']['messages'] else "No message"
+    if entry['audit_data']['messages']:
+        message = entry['audit_data']['messages'][0]
+    else:
+        message = "No message"
 
     return {
         'ip_address': ip_address,
