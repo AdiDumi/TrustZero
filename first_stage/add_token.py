@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 import sys
 import json
-import base64
-
-from cryptography.exceptions import InvalidSignature
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import padding
-from cryptography.hazmat.primitives.serialization import load_pem_public_key
 
 
 servers = {
@@ -34,7 +28,7 @@ def main():
         stored_data = {}
 
     # Update or insert new data for the public key
-    stored_data[user_public_key] = {"token": ":".join(server_token), "score": len(server_token)/2}
+    stored_data[user_public_key] = {"score": len(server_token)/2}
 
     # Write updated data back to the file
     with open(headers_file, 'w') as f:

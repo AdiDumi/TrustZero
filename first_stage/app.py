@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import base64
+import json
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
@@ -12,16 +13,16 @@ servers = [1, 2, 3, 4, 5]
 
 
 def load_private_key_from_file():
-    with open("/app/private_key.pem", "rb") as key_file:
-        private_key_data = key_file.read()
-    return private_key_data
+    with open("/app/private_keys.txt", "rb") as key_file:
+        private_key_data = json.load(key_file)
+    return private_key_data[str(own_id)]
 
 
 def generate_certificate(user_pk, private_key):
-    private_key = load_pem_private_key(private_key, password=None)
+    private_key = load_pem_private_key(private_key.encode('utf-8'), password=None)
 
     signature = private_key.sign(
-        base64.b64decode(user_pk),
+        base64.b64decode(user_pk.encode('utf-8')),
         padding.PSS(
             mgf=padding.MGF1(hashes.SHA256()),
             salt_length=padding.PSS.MAX_LENGTH
@@ -44,7 +45,7 @@ def add_token_to_response(token_list, user_pk):
         key = pair[0]
         if int(key) == own_id:
             id_found = True
-            token_list[i + 1] = signature
+            token_list[i + 1] = base64.b64encode(signature).decode('utf-8')
             break
 
     if not id_found:
@@ -73,6 +74,7 @@ def login():
 
     # Modify the response body to add the token
     header = add_token_to_response(parts[1:], user_public_key)
+
     response.headers['User-Key-Signatures'] = user_public_key + ":" + ":".join(header)
     return response, status_code
 

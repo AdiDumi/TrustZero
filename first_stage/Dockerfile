@@ -16,6 +16,10 @@ COPY app.py /app
 COPY requirements.txt /app
 COPY add_token.py /app
 COPY check_signatures.py /app
+COPY public_keys.txt /app
+COPY private_keys.txt /app
+COPY block_ip.py /app
+COPY ip_blocked.txt /app
 
 COPY process_log.py /usr/local/bin/process_log.py
 
@@ -24,12 +28,17 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 RUN dos2unix add_token.py
 RUN dos2unix check_signatures.py
+RUN dos2unix block_ip.py
 RUN chmod 777 add_token.py
 RUN chmod 777 check_signatures.py
 RUN chmod +x /usr/local/bin/process_log.py
 RUN chmod 755 /app
 RUN touch stored_header.json
 RUN chmod 766 stored_header.json
+RUN chmod 644 public_keys.txt
+RUN chmod 644 private_keys.txt
+RUN chmod 766 ip_blocked.txt
+RUN chmod 777 block_ip.py
 # Set up Apache and ModSecurity
 RUN a2enmod security2 proxy proxy_http rewrite deflate headers proxy_balancer proxy_connect proxy_html
 

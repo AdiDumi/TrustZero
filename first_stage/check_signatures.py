@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import base64
+import binascii
+import json
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
@@ -7,37 +9,22 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.exceptions import InvalidSignature, InvalidKey
 import sys
 
-servers = {
-    1: "asdad",
-    2: "dafad",
-}
-
 
 own_id = 1
 
 
-headers_file = "/app/stored_header.json"
-
-
-def verify_trust_token(user_pk, token):
+def verify_trust_token(user_pk, token, public_keys):
     score = 0
-    result_list = []
     for i in range(0, len(token), 2):
         pair = token[i:i + 2]
         value = pair[1]
-        key = pair[0]
-        signature = bytes.fromhex(value)
-        server = key
-        server_public_key = load_pem_public_key(servers[server].encode())
-        item = {
-            "id": int(key),
-            "signature": value
-        }
-        result_list.append(item)
+        server = pair[0]
         try:
+            signature = base64.b64decode(value.encode('utf-8'))
+            server_public_key = load_pem_public_key(public_keys[server].encode('utf-8'))
             server_public_key.verify(
                 signature,
-                user_pk,
+                base64.b64decode(user_pk.encode('utf-8')),
                 padding.PSS(
                     mgf=padding.MGF1(hashes.SHA256()),
                     salt_length=padding.PSS.MAX_LENGTH
@@ -47,15 +34,23 @@ def verify_trust_token(user_pk, token):
             score = score + 1
         except InvalidSignature:
             sys.stdout.write("error")
-    return score, result_list
+        except binascii.Error:
+            sys.stdout.write("error")
+    return score
 
 
 def main():
     if len(sys.argv) < 2:
-        return 0  # Return 0 if User-Signature header is missing or not as expected
+        sys.stdout.write("error")  # if User-Signature header is missing or not as expected
     else:
         parts = sys.argv[1].split(":")
         public_key_str = parts[0]
+        try:
+            with open("/app/public_keys.txt", 'r') as f:
+                public_keys = json.load(f)
+        except json.JSONDecodeError:
+            public_keys = {}
+
         try:
             # Attempt to load the public key
             serialization.load_pem_public_key(
@@ -65,11 +60,23 @@ def main():
             sys.stdout.write("error")
         user_signatures = parts[1:]
 
-        # Get the score of the signatures(if correct)
-        score, token = verify_trust_token(public_key_str, user_signatures)
+        score = verify_trust_token(public_key_str, user_signatures, public_keys)
 
-        # Print the score
-        #sys.stdout.write(str(score))
+        try:
+            with open("/app/stored_header.json", 'r') as f:
+                stored_data = json.load(f)
+        except json.JSONDecodeError:
+            # If the file is empty or doesn't exist, or contains invalid JSON
+            stored_data = {}
+
+        # Update or insert new data for the public key
+        stored_data[public_key_str] = score
+
+        # Write updated data back to the file
+        with open("/app/stored_header.json", 'w') as f:
+            json.dump(stored_data, f, indent=4)
+
+        return None
 
 
 if __name__ == "__main__":

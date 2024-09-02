@@ -27,12 +27,12 @@ headers = {
     'User-Key-Signatures': encoded_key
 }
 
-for i in range(1):
+for i in range(2):
     try:
         response = requests.post(url, headers=headers, data=data)
         print(response.text)
         print(response.headers)
-        if 'User-Signatures' in response.headers:
+        if 'User-Key-Signatures' in response.headers:
             headers['User-Key-Signatures'] = response.headers['User-Key-Signatures']
     except Exception as e:
         print(f"An error occurred: {e}")
