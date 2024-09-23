@@ -7,7 +7,7 @@ from cryptography.hazmat.primitives.serialization import load_pem_private_key
 
 app = Flask(__name__)
 
-own_id = 1
+own_id = 5
 
 servers = [1, 2, 3, 4, 5]
 

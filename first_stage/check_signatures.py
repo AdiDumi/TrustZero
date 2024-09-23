@@ -10,7 +10,7 @@ from cryptography.exceptions import InvalidSignature, InvalidKey
 import sys
 
 
-own_id = 1
+own_id = 5
 
 
 def verify_trust_token(user_pk, token, public_keys):
