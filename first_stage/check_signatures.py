@@ -60,21 +60,21 @@ def main():
             sys.stdout.write("error")
         user_signatures = parts[1:]
 
-        score = verify_trust_token(public_key_str, user_signatures, public_keys)
+        verify_trust_token(public_key_str, user_signatures, public_keys)
 
-        try:
-            with open("/app/stored_header.json", 'r') as f:
-                stored_data = json.load(f)
-        except json.JSONDecodeError:
-            # If the file is empty or doesn't exist, or contains invalid JSON
-            stored_data = {}
-
-        # Update or insert new data for the public key
-        stored_data[public_key_str] = score
-
-        # Write updated data back to the file
-        with open("/app/stored_header.json", 'w') as f:
-            json.dump(stored_data, f, indent=4)
+        # try:
+        #     with open("/app/stored_header.json", 'r') as f:
+        #         stored_data = json.load(f)
+        # except json.JSONDecodeError:
+        #     # If the file is empty or doesn't exist, or contains invalid JSON
+        #     stored_data = {}
+        #
+        # # Update or insert new data for the public key
+        # stored_data[public_key_str] = score
+        #
+        # # Write updated data back to the file
+        # with open("/app/stored_header.json", 'w') as f:
+        #     json.dump(stored_data, f, indent=4)
 
         return None
 
