@@ -1,4 +1,3 @@
-import requests
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
@@ -80,7 +79,7 @@ def send_request(user_id):
                 # Append performance data
                 request_times.append(request_duration)
             check_time = time.time()
-            if check_time - start_time > ((1000 - user_id) * 3):
+            if check_time - start_time > ((1500 - user_id) * 3):
                 break
         return [successful_requests + failed_requests, request_times, requests_time, start_time, user_id]
     else:
@@ -97,7 +96,7 @@ def send_request(user_id):
             except Exception as e:
                 print(f"An error occurred in worker {user_id}: {e}")
             check_time = time.time()
-            if check_time - start_time > ((1000 - user_id) * 3):
+            if check_time - start_time > ((1500 - user_id) * 3):
                 break
         return [0, [], [], start_time, user_id]
 
@@ -142,11 +141,12 @@ for user_time in user_start_times[1::100]:
     before_idx = max(i for i, t in enumerate(request_start_times) if t < user_time)
     after_idx = min(i for i, t in enumerate(request_start_times) if t > user_time)
     after = before_idx
-    mean_interval = sum(new_list[before:after]) / len(new_list[before:after])
+    mean_interval = -1
+    if (len(new_list[before:after]) != 0):
+        mean_interval = sum(new_list[before:after]) / len(new_list[before:after])
     before = after + 1
     # Add a vertical line between the requests
-    color = mcolors.to_rgba((1, 0, 0), alpha=1 - 0.1 * (ids/100))
-    plt.axvline(x=(before_idx + after_idx) / 2, color=color, linestyle='--', label=f'Latency with {ids} users is {mean_interval}')
+    plt.axvline(x=(before_idx + after_idx) / 2, color=(1, ((ids - 100)/1000), ((ids-100)/1000)), linestyle='--', label=f'Latency with {ids} users is {mean_interval}')
     ids += 100
 
 plt.xlabel('Request Number')
@@ -174,5 +174,5 @@ plt.legend()
 # print(f"Mean request time is {mean}")
 # Show the plots
 plt.tight_layout()
-plt.savefig("test3.png", format='png')
-plt.show()
+plt.savefig("test2.png", format='png')
+#plt.show()

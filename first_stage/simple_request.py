@@ -38,6 +38,7 @@ headers = {
 try:
     response = requests.post(url[0], headers=headers, data=data)
 
+    print(response.headers)
     if 'User-Key-Signatures' in response.headers:
         headers['User-Key-Signatures'] = response.headers['User-Key-Signatures']
 
