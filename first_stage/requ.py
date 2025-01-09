@@ -8,6 +8,7 @@ import random
 import time
 import concurrent.futures
 import matplotlib.pyplot as plt
+import numpy as np
 import matplotlib.colors as mcolors
 import threading
 
@@ -49,14 +50,14 @@ def send_request(user_id):
         requests_time = []
         # Lists to store performance data
         request_times = []  # Store time taken for each request
-        start_time = time.time()
+        start_time = time.monotonic()
         while True:
-            request_start_time = time.time()  # Time before request
+            request_start_time = time.monotonic()  # Time before request
             try:
                 choice = random.choice(url)
                 chosen.append(choice)
                 response = requests.post(choice, headers=headers, data=data)
-                request_end_time = time.time()  # Time after request
+                request_end_time = time.monotonic()  # Time after request
                 requests_time.append(request_end_time)
                 request_duration = request_end_time - request_start_time
 
@@ -71,19 +72,19 @@ def send_request(user_id):
                     headers['User-Key-Signatures'] = response.headers['User-Key-Signatures']
 
             except Exception as e:
-                request_end_time = time.time()
+                request_end_time = time.monotonic()
                 print(f"An error occurred in worker {user_id}: {e}")
                 request_duration = request_end_time - request_start_time
                 requests_time.append(request_end_time)
                 failed_requests += 1
                 # Append performance data
                 request_times.append(request_duration)
-            check_time = time.time()
-            if check_time - start_time > ((1500 - user_id) * 3):
+            check_time = time.monotonic()
+            if check_time - start_time > ((2200 - user_id) * 3):
                 break
         return [successful_requests + failed_requests, request_times, requests_time, start_time, user_id]
     else:
-        start_time = time.time()
+        start_time = time.monotonic()
         while True:
             try:
                 choice = random.choice(url)
@@ -95,17 +96,17 @@ def send_request(user_id):
 
             except Exception as e:
                 print(f"An error occurred in worker {user_id}: {e}")
-            check_time = time.time()
-            if check_time - start_time > ((1500 - user_id) * 3):
+            check_time = time.monotonic()
+            if check_time - start_time > ((2200 - user_id) * 3):
                 break
         return [0, [], [], start_time, user_id]
 
 
 all_results = []
 # Function to send multiple requests in parallel
-with ThreadPoolExecutor(max_workers=1000) as executor:
+with ThreadPoolExecutor(max_workers=2000) as executor:
     futures = []
-    for j in range(1000):
+    for j in range(2000):
         print(f"Starting user {j}")
         futures.append(executor.submit(send_request, j))  # Launch 100 threads
         time.sleep(3)
@@ -130,12 +131,21 @@ for sublist in sorted_results:
 mean = sum(new_list) / sum(sublist[0] for sublist in sorted_results)
 # Plot request durations
 plt.subplot(1, 1, 1)
-plt.plot(new_list, marker='o', linestyle='-', color='b', label='Request Time (s)')
+plt.plot(new_list, marker='o', linestyle='', color='b', label='Request Time (s)')
 plt.axhline(y=mean, color='k', linestyle='--', label=f'Overall Mean: {mean}')
-ids = 100
+
+times = new_list
+x = np.arange(len(times))  # x-axis values (Request Number)
+
+# Fit a trend line (polynomial of degree 2, can adjust degree as needed)
+coeffs = np.polyfit(x, times, 2)  # 2nd-degree polynomial fit
+trendline = np.polyval(coeffs, x)  # Evaluate the polynomial
+plt.plot(x, trendline, color='orange', label='Trend Line (Growth)')  # Trend line
+
+ids = 200
 before = 0
 after = 0
-for user_time in user_start_times[1::100]:
+for user_time in user_start_times[1::200]:
     # Find the request before and after the user start time
     print(f'Plotting users {ids}')
     before_idx = max(i for i, t in enumerate(request_start_times) if t < user_time)
@@ -146,12 +156,11 @@ for user_time in user_start_times[1::100]:
         mean_interval = sum(new_list[before:after]) / len(new_list[before:after])
     before = after + 1
     # Add a vertical line between the requests
-    plt.axvline(x=(before_idx + after_idx) / 2, color=(1, ((ids - 100)/1000), ((ids-100)/1000)), linestyle='--', label=f'Latency with {ids} users is {mean_interval}')
-    ids += 100
+    plt.axvline(x=(before_idx + after_idx) / 2, color=(1, ((ids - 200)/2000), ((ids-200)/2000)), linestyle='--', label=f'Latency at {ids} users: {mean_interval}')
+    ids += 200
 
-plt.xlabel('Request Number')
+plt.xlabel('User request id')
 plt.ylabel('Time (seconds)')
-plt.title('Request Duration Over Time')
 plt.legend()
 
 # # Plot success vs failure
@@ -174,5 +183,5 @@ plt.legend()
 # print(f"Mean request time is {mean}")
 # Show the plots
 plt.tight_layout()
-plt.savefig("test2.png", format='png')
+plt.savefig("test2new.png", format='png')
 #plt.show()

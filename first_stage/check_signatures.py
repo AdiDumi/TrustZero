@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import base64
 import binascii
-import json
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
@@ -9,9 +8,8 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.exceptions import InvalidSignature, InvalidKey
 import sys
 
-from first_stage.simple_request import public_key
 
-own_id = 2
+own_id = 5
 
 public_keys_d = {
 "1":"-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlgjRLGIr2FvP7izZHasu9p9CiUxFzy06maC0bZhU5VzGOElV7KdQQFvSGHP+QII0dfm+JXajZdVnXojuGan9JuIDftb8MA+HKoVYLBSPLW25kqPTbkJXh4ZaFew9UNZ5qb3B1+wNOfFoOLvqVHsgU8hmW6cKGqyuQXvTCGnVl7vmfbvpn7TYM/3TbbkvI36He4Qp9w3MRUROlDTCIbifxC67SNXIdb8oLapOBrCaazNrRu8SYleCFMSylCFrkfRKS/7WfPX3sDq8aacL0OUuIiwXvjVA5AMlz2TZYtUBgrVXZMdUlcPNJ/jqOTIttSg0+xCQNR5kW4FzTaajxJgjhwIDAQAB\n-----END PUBLIC KEY-----",
@@ -53,11 +51,6 @@ def main():
     else:
         parts = sys.argv[1].split(":")
         public_key_str = parts[0]
-        # try:
-        #     with open("/app/public_keys.txt", 'r') as f:
-        #         public_keys = json.load(f)
-        # except json.JSONDecodeError:
-        #     public_keys = {}
 
         try:
             # Attempt to load the public key
@@ -69,20 +62,6 @@ def main():
         user_signatures = parts[1:]
 
         verify_trust_token(public_key_str, user_signatures, public_keys_d)
-
-        # try:
-        #     with open("/app/stored_header.json", 'r') as f:
-        #         stored_data = json.load(f)
-        # except json.JSONDecodeError:
-        #     # If the file is empty or doesn't exist, or contains invalid JSON
-        #     stored_data = {}
-        #
-        # # Update or insert new data for the public key
-        # stored_data[public_key_str] = score
-        #
-        # # Write updated data back to the file
-        # with open("/app/stored_header.json", 'w') as f:
-        #     json.dump(stored_data, f, indent=4)
 
         return None
 

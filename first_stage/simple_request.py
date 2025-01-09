@@ -3,8 +3,6 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 import base64
-import random
-import time
 
 url = [
     'http://localhost:8080/login',
@@ -41,6 +39,11 @@ try:
     print(response.headers)
     if 'User-Key-Signatures' in response.headers:
         headers['User-Key-Signatures'] = response.headers['User-Key-Signatures']
+
+    response = requests.post(url[0], headers=headers, data=data)
+
+    print(response.headers)
+
 
 except Exception as e:
     print(f"An error occurred: {e}")

@@ -15,7 +15,7 @@ public_key_sizes = {
 }
 
 # Define a range of number of signatures
-num_signatures_range = np.arange(1, 81)  # From 1 to 20 signatures
+num_signatures_range = np.arange(1, 101)  # From 1 to 20 signatures
 
 # Initialize a dictionary to hold the total sizes
 total_sizes = {key: [] for key in signature_sizes.keys()}
@@ -31,8 +31,10 @@ for num_signatures in num_signatures_range:
 # Create the plot
 plt.figure(figsize=(10, 6))
 
-for algo, sizes in total_sizes.items():
-    plt.plot(num_signatures_range, sizes, marker='o', label=algo)
+markers = ['o', 's', '^', 'D', '*']  # Define a list of markers
+for i, (algo, sizes) in enumerate(total_sizes.items()):
+    marker = markers[i % len(markers)]  # Cycle through markers if there are more algorithms than markers
+    plt.plot(num_signatures_range, sizes, marker=marker, label=algo)
 
 # Adding labels and title
 plt.title('Total Size vs. Number of Signatures (Including Public Key Size)')
@@ -43,5 +45,5 @@ plt.legend()
 plt.tight_layout()
 
 # Show the plot
-plt.savefig("test2.png", format='png')
+plt.savefig("signatures.png", format='png')
 plt.show()
