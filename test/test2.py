@@ -8,6 +8,7 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 
+# url of servers
 url = [
     'http://localhost:8080/login',
     'http://localhost:8081/login',
@@ -15,10 +16,12 @@ url = [
     'http://localhost:8083/login',
     'http://localhost:8084/login'
 ]
+# test data
 data = {'username': 'admin', 'password': 'password'}
 
-
+# Implementation of a 'honest' client
 def good_client():
+    # Generate the private key
     private_key = rsa.generate_private_key(
         public_exponent=65537,
         key_size=2048,
@@ -35,6 +38,7 @@ def good_client():
 
     encoded_key = base64.b64encode(public_pem).decode('utf-8')
 
+    # Put the encoded key inside the header
     headers = {
         'User-Key-Signatures': encoded_key
     }
@@ -43,7 +47,7 @@ def good_client():
     # Lists to store performance data
     request_times = []  # Store time taken for each request
     request_result = []  # Store the result of the request(1/0)
-    request_signatures = []  # Store the number if signatures of a request
+    request_signatures = []  # Store the number of signatures of a request
     for i in range(50):
         time.sleep(0.5)
         request_start_time = time.monotonic()  # Time before request
@@ -81,6 +85,7 @@ def good_client():
 
 
 def bad_client():
+    # Generate the private key
     private_key = rsa.generate_private_key(
         public_exponent=65537,
         key_size=2048,
@@ -97,6 +102,7 @@ def bad_client():
 
     encoded_key = base64.b64encode(public_pem).decode('utf-8')
 
+    # Put the encoded key inside the header
     headers = {
         'User-Key-Signatures': encoded_key
     }
@@ -105,7 +111,7 @@ def bad_client():
     # Lists to store performance data
     request_times = []  # Store time taken for each request
     request_result = []  # Store the result of the request(1/0)
-    request_signatures = []  # Store the number if signatures of a request
+    request_signatures = []  # Store the number of signatures of a request
     for i in range(50):
         time.sleep(0.5)
         request_start_time = time.monotonic()  # Time before request
@@ -203,5 +209,5 @@ axs[2].grid(True)
 
 # Adjust layout
 plt.tight_layout()
-plt.savefig("test2.png", format='png')
+plt.savefig("test2.pdf", format='pdf')
 plt.show()

@@ -9,6 +9,7 @@ import random
 
 
 start_time = time.time()
+# url of servers
 url = [
     'http://localhost:8080/login',
     'http://localhost:8081/login',
@@ -16,10 +17,12 @@ url = [
     'http://localhost:8083/login',
     'http://localhost:8084/login'
 ]
+# test data
 data = {'username': 'admin', 'password': 'password'}
 
-
+# Implementation of a client with multiple signatures(up to 5)
 def multiple_signatures_client():
+    # Generate the private key
     private_key = rsa.generate_private_key(
         public_exponent=65537,
         key_size=2048,
@@ -36,10 +39,12 @@ def multiple_signatures_client():
 
     encoded_key = base64.b64encode(public_pem).decode('utf-8')
 
+    # Put the encoded key inside the header
     headers = {
         'User-Key-Signatures': encoded_key
     }
 
+    # Collect the signatures from all servers
     for i in range(5):
         try:
             response = requests.post(url[i], headers=headers, data=data)
@@ -74,8 +79,9 @@ def multiple_signatures_client():
             request_times.append(request_duration)
     return request_times
 
-
+# Implementation of a client with no signatures
 def no_signatures_client():
+    # Generate the private key
     private_key = rsa.generate_private_key(
         public_exponent=65537,
         key_size=2048,
@@ -92,6 +98,7 @@ def no_signatures_client():
 
     encoded_key = base64.b64encode(public_pem).decode('utf-8')
 
+    # Put the encoded key inside the header
     headers = {
         'User-Key-Signatures': encoded_key
     }
@@ -149,7 +156,7 @@ plt.legend()
 
 # Show the plots
 plt.tight_layout()
-plt.savefig("test1.png", format='png')
+plt.savefig("test1.pdf", format='pdf')
 plt.show()
 
 # Box plot for the request durations
@@ -168,7 +175,7 @@ plt.ylabel('Time (seconds)')
 plt.title('Box Plot of Request Durations')
 
 # Save the box plot to a file
-plt.savefig("test1box.png", format='png')
+plt.savefig("test1box.pdf", format='pdf')
 
 # Show the box plot
 plt.show()

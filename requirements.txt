@@ -1,2 +1,5 @@
 flask
+requests
+numpy
+matplotlib
 cryptography>=3.4.8

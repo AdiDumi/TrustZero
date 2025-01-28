@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.colors as mcolors
 import threading
 
-
+# url of servers
 url = [
     'http://localhost:8080/login',
     'http://localhost:8081/login',
@@ -20,6 +20,7 @@ url = [
     'http://localhost:8083/login',
     'http://localhost:8084/login'
 ]
+# test data
 data = {'username': 'admin', 'password': 'password'}
 
 
@@ -152,7 +153,7 @@ for user_time in user_start_times[1::200]:
     after_idx = min(i for i, t in enumerate(request_start_times) if t > user_time)
     after = before_idx
     mean_interval = -1
-    if (len(new_list[before:after]) != 0):
+    if len(new_list[before:after]) != 0:
         mean_interval = sum(new_list[before:after]) / len(new_list[before:after])
     before = after + 1
     # Add a vertical line between the requests
@@ -163,25 +164,6 @@ plt.xlabel('User request id')
 plt.ylabel('Time (seconds)')
 plt.legend()
 
-# # Plot success vs failure
-# plt.subplot(3, 1, 2)
-# plt.plot(res_request_statuses, marker='o', linestyle='-', color='r', label='Success (1) / Failure (0)')
-# plt.xlabel('Request Number')
-# plt.ylabel('Status')
-# plt.title('Request Success and Failure Over Time')
-# plt.legend()
-#
-# # Plot success vs failure
-# plt.subplot(3, 1, 3)
-# plt.plot(res_number_of_sign, marker='o', linestyle='-', color='g', label='Signatures')
-# plt.xlabel('Signatures per request')
-# plt.ylabel('Number of signatures')
-# plt.title('Signatures per request')
-# plt.legend()
-
-# mean = sum(res_request_times) / len(res_request_times)
-# print(f"Mean request time is {mean}")
 # Show the plots
 plt.tight_layout()
-plt.savefig("test2new.png", format='png')
-#plt.show()
+plt.savefig("test3.pdf", format='pdf')
