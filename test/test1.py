@@ -127,40 +127,43 @@ def no_signatures_client():
             request_times.append(request_duration)
     return request_times
 
+plt.rcParams.update({'font.size': 20})
 
-# Plot the performance data
+# Plot the performance data for different clients
 times1 = no_signatures_client()
 times2 = multiple_signatures_client()
+
 plt.figure(figsize=(10, 8))
 
 mean1 = sum(times1) / 500
 mean2 = sum(times2) / 500
 
-# Plot request durations
-plt.subplot(2, 1, 1)
+# Plot request durations for no signature client
 plt.plot(times1, marker='o', linestyle='', color='b', label='Request Time (s)')
 plt.axhline(y=mean1, color='k', linestyle='--', label=f'Mean: {mean1}')
 plt.xlabel('Request Number')
 plt.ylabel('Time (seconds)')
-plt.title('Request Duration for 0 signatures user')
-plt.legend()
+plt.legend(fontsize="12")
 
-# Plot success vs failure
-plt.subplot(2, 1, 2)
+# Save the plots
+plt.tight_layout()
+plt.savefig("test1_no_sign.pdf", format='pdf')
+
+plt.figure(figsize=(10, 8))
+
+# Plot request durations for 5 signature client
 plt.plot(times2, marker='o', linestyle='', color='r', label='Request Time (s)')
 plt.axhline(y=mean2, color='k', linestyle='--', label=f'Mean: {mean2}')
 plt.xlabel('Request Number')
 plt.ylabel('Time (seconds)')
-plt.title('Request Duration for 5 signatures user')
-plt.legend()
+plt.legend(fontsize="12")
 
-# Show the plots
+# Save the plots
 plt.tight_layout()
-plt.savefig("test1.pdf", format='pdf')
-plt.show()
+plt.savefig("test1_5_sign.pdf", format='pdf')
 
 # Box plot for the request durations
-plt.figure(figsize=(8, 6))
+plt.figure(figsize=(10, 8))
 
 # Create the box plot
 plt.boxplot([times1, times2], tick_labels=['5 Signatures User', '0 Signatures User'], patch_artist=True,
@@ -172,10 +175,6 @@ plt.grid(axis='y', linestyle='--', color='gray', alpha=0.7)  # Horizontal grid l
 
 # Add labels and title
 plt.ylabel('Time (seconds)')
-plt.title('Box Plot of Request Durations')
 
 # Save the box plot to a file
 plt.savefig("test1box.pdf", format='pdf')
-
-# Show the box plot
-plt.show()

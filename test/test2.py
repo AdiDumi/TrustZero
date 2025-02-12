@@ -151,6 +151,8 @@ def bad_client():
     return request_times, request_result, request_signatures
 
 
+plt.rcParams.update({'font.size': 18})
+
 # Plot the performance data
 times1, results1, signatures1 = bad_client()
 times2, results2, signatures2 = good_client()
@@ -186,7 +188,7 @@ axs[0].axvline(middle_point, color='purple', linestyle='-', label='User Separato
 axs[0].set_title('Request Duration Over Time')
 axs[0].set_xlabel('Request Number')
 axs[0].set_ylabel('Time (seconds)')
-axs[0].legend()
+axs[0].legend(fontsize="12")
 axs[0].grid(True)
 
 # Plot 2: Request Success and Failure Over Time
@@ -195,7 +197,7 @@ axs[1].axvline(middle_point, color='purple', linestyle='-', label='User Separato
 axs[1].set_title('Request Success and Failure')
 axs[1].set_xlabel('Request Number')
 axs[1].set_ylabel('Status')
-axs[1].legend()
+axs[1].legend(fontsize="12")
 axs[1].grid(True)
 
 # Plot 3: Signatures per Request
@@ -204,10 +206,9 @@ axs[2].axvline(middle_point, color='purple', linestyle='-', label='User Separato
 axs[2].set_title('Signatures per request')
 axs[2].set_xlabel('Request Number')
 axs[2].set_ylabel('Number of signatures')
-axs[2].legend()
+axs[2].legend(fontsize="12")
 axs[2].grid(True)
 
 # Adjust layout
 plt.tight_layout()
 plt.savefig("test2.pdf", format='pdf')
-plt.show()

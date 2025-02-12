@@ -9,7 +9,6 @@ import time
 import concurrent.futures
 import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib.colors as mcolors
 import threading
 
 # url of servers
@@ -31,7 +30,6 @@ def send_request(user_id):
         key_size=2048,
         backend=default_backend()
     )
-    chosen = []
     # Extract the public key
     public_key = private_key.public_key()
 
@@ -45,6 +43,7 @@ def send_request(user_id):
     headers = {
         'User-Key-Signatures': encoded_key
     }
+
     if user_id == 0:
         successful_requests = 0
         failed_requests = 0
@@ -56,7 +55,6 @@ def send_request(user_id):
             request_start_time = time.monotonic()  # Time before request
             try:
                 choice = random.choice(url)
-                chosen.append(choice)
                 response = requests.post(choice, headers=headers, data=data)
                 request_end_time = time.monotonic()  # Time after request
                 requests_time.append(request_end_time)
@@ -69,7 +67,6 @@ def send_request(user_id):
                 # Append performance data
                 request_times.append(request_duration)
                 if 'User-Key-Signatures' in response.headers:
-                    #number_of_sign.append((len(response.headers['User-Key-Signatures'].split(":")) - 1) / 2)
                     headers['User-Key-Signatures'] = response.headers['User-Key-Signatures']
 
             except Exception as e:
@@ -81,7 +78,7 @@ def send_request(user_id):
                 # Append performance data
                 request_times.append(request_duration)
             check_time = time.monotonic()
-            if check_time - start_time > ((2200 - user_id) * 3):
+            if check_time - start_time > ((2010 - user_id) * 2):
                 break
         return [successful_requests + failed_requests, request_times, requests_time, start_time, user_id]
     else:
@@ -89,7 +86,6 @@ def send_request(user_id):
         while True:
             try:
                 choice = random.choice(url)
-                chosen.append(choice)
                 response = requests.post(choice, headers=headers, data=data)
 
                 if 'User-Key-Signatures' in response.headers:
@@ -98,7 +94,7 @@ def send_request(user_id):
             except Exception as e:
                 print(f"An error occurred in worker {user_id}: {e}")
             check_time = time.monotonic()
-            if check_time - start_time > ((2200 - user_id) * 3):
+            if check_time - start_time > ((2010 - user_id) * 2):
                 break
         return [0, [], [], start_time, user_id]
 
@@ -110,38 +106,55 @@ with ThreadPoolExecutor(max_workers=2000) as executor:
     for j in range(2000):
         print(f"Starting user {j}")
         futures.append(executor.submit(send_request, j))  # Launch 100 threads
-        time.sleep(3)
+        time.sleep(2)
 
     for future in as_completed(futures):
         all_results.append(future.result())
 
 sorted_results = sorted(all_results, key=lambda x: x[-1])
 
-plt.figure(figsize=(10, 8))
+plt.rcParams.update({'font.size': 18})
 
-new_list = []
+times = []
 request_start_times = []
 user_start_times = []
+servers_load = []
 # Iterate through each sublist and extend the new list with the 4th element (which is a list)
 for sublist in sorted_results:
-    new_list.extend(sublist[1])
+    times.extend(sublist[1])
     request_start_times.extend(sublist[2])
     user_start_times.append(sublist[3])
 
+plt.figure(figsize=(10, 8))
 
-mean = sum(new_list) / sum(sublist[0] for sublist in sorted_results)
+mean = sum(times) / sum(sublist[0] for sublist in sorted_results)
 # Plot request durations
-plt.subplot(1, 1, 1)
-plt.plot(new_list, marker='o', linestyle='', color='b', label='Request Time (s)')
+plt.plot(times, marker='o', linestyle='', color='b', label='Request Time (s)')
 plt.axhline(y=mean, color='k', linestyle='--', label=f'Overall Mean: {mean}')
 
-times = new_list
-x = np.arange(len(times))  # x-axis values (Request Number)
+window_size = 100
 
-# Fit a trend line (polynomial of degree 2, can adjust degree as needed)
-coeffs = np.polyfit(x, times, 2)  # 2nd-degree polynomial fit
-trendline = np.polyval(coeffs, x)  # Evaluate the polynomial
-plt.plot(x, trendline, color='orange', label='Trend Line (Growth)')  # Trend line
+x = np.arange(window_size, len(times))  # x-axis values (Request Number)
+
+i = 0
+# Initialize an empty list to store moving averages
+moving_averages = []
+
+# Loop through the window of size 100
+while i < len(times) - window_size:
+
+    # Calculate the average of current window
+    window_average = round(np.sum(times[
+      i:i+window_size]) / window_size, 2)
+
+    # Store the average of current
+    # window in moving average list
+    moving_averages.append(window_average)
+
+    # Shift window to right by one position
+    i += 1
+
+plt.plot(x, moving_averages, color='orange', label='Moving average')  # Moving average line
 
 ids = 200
 before = 0
@@ -153,8 +166,8 @@ for user_time in user_start_times[1::200]:
     after_idx = min(i for i, t in enumerate(request_start_times) if t > user_time)
     after = before_idx
     mean_interval = -1
-    if len(new_list[before:after]) != 0:
-        mean_interval = sum(new_list[before:after]) / len(new_list[before:after])
+    if len(times[before:after]) != 0:
+        mean_interval = sum(times[before:after]) / len(times[before:after])
     before = after + 1
     # Add a vertical line between the requests
     plt.axvline(x=(before_idx + after_idx) / 2, color=(1, ((ids - 200)/2000), ((ids-200)/2000)), linestyle='--', label=f'Latency at {ids} users: {mean_interval}')
@@ -162,8 +175,8 @@ for user_time in user_start_times[1::200]:
 
 plt.xlabel('User request id')
 plt.ylabel('Time (seconds)')
-plt.legend()
+plt.legend(fontsize="12")
 
-# Show the plots
+# Save the plot
 plt.tight_layout()
 plt.savefig("test3.pdf", format='pdf')

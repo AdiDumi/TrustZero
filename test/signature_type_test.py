@@ -28,6 +28,7 @@ for num_signatures in num_signatures_range:
         total_size = (num_signatures * sig_size) + pub_key_size  # Calculate total size
         total_sizes[algo].append(total_size)
 
+plt.rcParams.update({'font.size': 20})
 # Create the plot
 plt.figure(figsize=(10, 6))
 
@@ -37,13 +38,11 @@ for i, (algo, sizes) in enumerate(total_sizes.items()):
     plt.plot(num_signatures_range, sizes, marker=marker, label=algo)
 
 # Adding labels and title
-plt.title('Total Size vs. Number of Signatures (Including Public Key Size)')
 plt.xlabel('Number of Signatures')
 plt.ylabel('Total Size (bytes)')
 plt.grid(True)
-plt.legend()
+plt.legend(fontsize="12")
 plt.tight_layout()
 
 # Show the plot
-plt.savefig("signatures.png", format='png')
-plt.show()
+plt.savefig("signatures.pdf", format='pdf')
