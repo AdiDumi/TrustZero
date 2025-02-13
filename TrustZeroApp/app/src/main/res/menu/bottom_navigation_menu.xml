@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/homeFragment"
+        android:icon="@drawable/ic_android_black_24dp"
+        android:title="Home" />
+
+    <item
+        android:id="@+id/keyListFragment"
+        android:icon="@drawable/ic_android_black_24dp"
+        android:title="Keys" />
+
+    <item
+        android:id="@+id/experimentFragment"
+        android:icon="@drawable/ic_android_black_24dp"
+        android:title="Experiment" />
+</menu>

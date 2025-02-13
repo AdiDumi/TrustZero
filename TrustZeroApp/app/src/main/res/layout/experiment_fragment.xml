@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/usernameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="admin"
+        android:hint="Username" />
+
+    <EditText
+        android:id="@+id/passwordEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="password"
+        android:hint="Password"
+        android:inputType="textPassword" />
+
+    <EditText
+        android:id="@+id/ipEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="192.168.1.238"
+        android:hint="IP Address"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/portEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="8080,8081,8082,8083,8084"
+        android:hint="Port"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/numberOfRequests"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="10"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/sendRequestButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Send Request"
+        android:paddingTop="16dp" />
+
+    <TextView
+        android:id="@+id/requestNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0/0"
+        android:textSize="20sp"
+        android:padding="16dp" />
+</LinearLayout>
